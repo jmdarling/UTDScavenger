@@ -1,8 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">UTD Scavenger</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_main">MainActivity</string>
-
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="join">Join</string>
+    <string name="create_new">Create New</string>
+    <string name="edit_existing">Edit Existing</string>
+    <string name="utdscavenger_logo">UTDScavenger Logo</string>
+    <string name="title_activity_join">JoinActivity</string>
+    <string name="title_activity_create">CreateActivity</string>
+    <string name="title_activity_edit">EditActivity</string>
+
 </resources>

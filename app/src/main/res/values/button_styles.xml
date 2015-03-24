@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="std_button">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:background">@color/std_blue</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <color name="std_blue">#2196F3</color>
+</resources>

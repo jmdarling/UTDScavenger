@@ -28,15 +28,29 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main" >
-            <!--Adding the Intent Filter tells the application to open on this activity first-->
+
+            <!-- Adding the Intent Filter tells the application to open on this activity first -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-        android:name=".MapsActivity"
-        android:label="@string/title_activity_maps" >
+            android:name=".MapsActivity"
+            android:label="@string/title_activity_maps" >
+        </activity>
+        <activity
+            android:name=".JoinActivity"
+            android:label="@string/title_activity_join" >
+        </activity>
+        <activity
+            android:name=".CreateActivity"
+            android:label="@string/title_activity_create" >
+        </activity>
+        <activity
+            android:name=".EditActivity"
+            android:label="@string/title_activity_edit" >
         </activity>
     </application>
 

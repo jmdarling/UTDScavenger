@@ -1,45 +1,64 @@
 package com.utd_scavenger.company.utdscavenger;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
+/**
+ * Intro activity for the application. This is where the user can decide to
+ * join, create, or edit a game.
+ *
+ * Written by Jonathan Darling
+ */
+public class MainActivity extends Activity {
 
-public class MainActivity extends ActionBarActivity {
-
+    /**
+     * Called when the activity is starting. This is where most initialization
+     * should go.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down then this Bundle
+     *                           contains the data it most recently supplied in
+     *                           onSaveInstanceState(Bundle). Otherwise it is
+     *                           null.
+     *
+     * Written by Jonathan Darling
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
 
+    /**
+     * Click listener for the join, create, and edit buttons. Clicking these
+     * buttons redirect to their respective activities.
+     *
+     * @param view The view that was clicked.
+     *
+     * Written by Jonathan Darling
+     */
+    public void onClick(View view) {
+        int buttonClicked = view.getId();
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+        // Check which button was clicked and start the button's corresponding
+        // activity.
+        switch (buttonClicked) {
+            case R.id.join_button:
+                Intent joinIntent = new Intent(this, JoinActivity.class);
+                startActivity(joinIntent);
+                break;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+            case R.id.create_button:
+                Intent createIntent = new Intent(this, CreateActivity.class);
+                startActivity(createIntent);
+                break;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+            case R.id.edit_button:
+                Intent editIntent = new Intent(this, EditActivity.class);
+                startActivity(editIntent);
+                break;
         }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    /** Called when the user clicks the Test Google Maps button */
-    public void btnGoogleMaps(View view) {
-        setContentView(R.layout.activity_maps);
     }
 }

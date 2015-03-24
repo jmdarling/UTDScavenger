@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private LocationManager mLocationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,19 +62,19 @@ public class MapsActivity extends FragmentActivity {
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         // Get LocationManager object from System Service LOCATION_SERVICE
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         // Create a criteria object to retrieve provider
         Criteria criteria = new Criteria();
 
         // Get the name of the best provider
-        String provider = locationManager.getBestProvider(criteria, true);
+        String provider = mLocationManager.getBestProvider(criteria, true);
 
         // set map type
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);   // MAP_TYPE_HYBRID
 
         // Start new code by kevto.
-        locationManager.requestLocationUpdates(provider, 1000, 0.0f, mLocationListener); // (String) provider, time in milliseconds when to check for an update, distance to change in coordinates to request an update, LocationListener.
+        //mLocationManager.requestLocationUpdates(provider, 1000, 0.0f, mLocationListener); // (String) provider, time in milliseconds when to check for an update, distance to change in coordinates to request an update, LocationListener.
         // End new code by kevto
     }
 }
