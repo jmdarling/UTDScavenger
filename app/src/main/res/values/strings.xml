@@ -13,5 +13,7 @@
     <string name="title_activity_join">JoinActivity</string>
     <string name="title_activity_create">CreateActivity</string>
     <string name="title_activity_edit">EditActivity</string>
+    <string name="tap_phones_graphic">Tap Phones Graphic</string>
+    <string name="tap_phones_client_instructions">Tap your device with the host\'s device...</string>
 
 </resources>
