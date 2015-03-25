@@ -6,7 +6,7 @@ import android.os.Bundle;
 /**
  * Handles the process of joining an existing game.
  *
- * Written by Jonathan Darling
+ * Written by Jonathan Darling and Stephen Kuehl
  */
 public class JoinActivity extends Activity {
 
