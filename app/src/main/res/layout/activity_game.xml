@@ -1,0 +1,50 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.utd_scavenger.company.utdscavenger.GameActivity"
+    android:orientation="vertical">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.MapFragment"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageButton
+            android:src="@drawable/pos_loc"
+            android:contentDescription="@string/found_items"
+
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="5dp"
+
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:padding="16dp"
+
+            android:scaleType="fitCenter"
+            android:background="@drawable/round_blue_background" />
+
+        <ImageButton
+            android:src="@drawable/neg_loc"
+            android:contentDescription="@string/items_to_find"
+
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="5dp"
+
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:padding="16dp"
+
+            android:scaleType="fitCenter"
+            android:background="@drawable/round_blue_background" />
+    </RelativeLayout>
+
+</FrameLayout>

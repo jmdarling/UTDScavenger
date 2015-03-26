@@ -15,5 +15,8 @@
     <string name="title_activity_edit">EditActivity</string>
     <string name="tap_phones_graphic">Tap Phones Graphic</string>
     <string name="tap_phones_client_instructions">Tap your device with the host\'s device...</string>
+    <string name="title_activity_game">GameActivity</string>
+    <string name="found_items">Found Items</string>
+    <string name="items_to_find">Items to Find</string>
 
 </resources>
