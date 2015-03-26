@@ -76,6 +76,7 @@ public class JoinActivity extends Activity {
             Log.e("TagDispatch", e.toString());
         }
 
+        /*blah blah blah*/
         mNFCTechLists = new String[][] { new String[] { NfcF.class.getName() } };
 
     }
