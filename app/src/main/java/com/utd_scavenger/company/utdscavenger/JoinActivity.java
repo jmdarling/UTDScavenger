@@ -8,12 +8,14 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-import android.nfc.tech.NfcF;
+
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import java.util.Arrays;
 
@@ -48,26 +50,26 @@ public class JoinActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
 
-        /*Set the textview for information output by the NFC Tag*/
+        // Set the textview for information output by the NFC Tag.
         mTextView = (TextView)findViewById(R.id.tv);
 
-        /*instantiate the the NFC Adapter*/
+        // Instantiate the the NFC Adapter.
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
-        /*Check to see if the device supports NFC*/
+        // Check to see if the device supports NFC.
         if (mNfcAdapter != null) {
-            /*Inital text in the textview*/
-            mTextView.setText("Read an NFC tag");
+            // Inital text in the textview.
+            mTextView.setText("Awaiting Contact..");
         } else {
-            /*if the device does not support NFC*/
-            mTextView.setText("This phone is not NFC enabled.");
+            // if the device does not support NFC
+            mTextView.setText("This device does not have NFC enabled.");
         }
 
-        // create an intent with the NFC tag data and deliver to the Join Activity
+        // Create an intent with the NFC tag data and deliver to the Join Activity.
         mPendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
-        // set an intent filter for all MIME data
+        // Set an intent filter for all MIME data.
         IntentFilter ndefIntent = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
         try {
             ndefIntent.addDataType("*/*");
@@ -76,21 +78,23 @@ public class JoinActivity extends Activity {
             Log.e("TagDispatch", e.toString());
         }
 
-        /*blah blah blah*/
-        mNFCTechLists = new String[][] { new String[] { NfcF.class.getName() } };
-
     }
 
-
-
+    /**
+     * Called when the new intent needs to be created
+     *
+     * @param intent The new intent that was started for the activity.
+     *
+     * Written by Stephen Kuehl
+     */
     @Override
     public void onNewIntent(Intent intent) {
         String action = intent.getAction();
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
 
-        String s = action + "\n\n" + tag.toString();
+        String s = "The NFC Text Output:";
 
-        // parse through all NDEF messages and their records and pick text type only
+        // Parse through all NDEF messages and their records and pick text type only.
         Parcelable[] data = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
         if (data != null) {
             try {
@@ -103,32 +107,52 @@ public class JoinActivity extends Activity {
                             String textEncoding = ((payload[0] & 0200) == 0) ? "UTF-8" : "UTF-16";
                             int langCodeLen = payload[0] & 0077;
 
-                            s += ("\n\nNdefMessage[" + i + "], NdefRecord[" + j + "]:\n\"" +
-                                    new String(payload, langCodeLen + 1, payload.length - langCodeLen - 1,
+                            /*Display the text that is received*/
+                            s += ("\n\n\"" + new String(payload, langCodeLen + 1, payload.length - langCodeLen - 1,
                                             textEncoding) + "\"");
                         }
                     }
                 }
             } catch (Exception e) {
+                // Error reading the tag.
                 Log.e("TagDispatch", e.toString());
             }
         }
 
-        mTextView.setText(s);
+        // Display a message to the user that the NFC tag has been accepted
+        Toast.makeText(getApplicationContext(), "Success! Loading Google Maps..",
+                Toast.LENGTH_LONG).show();
+
+        // Navigate to the Maps activity
+        Intent mapIntent = new Intent (this, GameActivity.class);
+        startActivity(mapIntent);
     }
 
+    /**
+     * onResume is called after the onPause to being interaction with the user which
+     * includes waiting for the NFC scan
+     *
+     * Written by Stephen Kuehl
+     */
     @Override
     public void onResume() {
         super.onResume();
 
-        if (mNfcAdapter != null)
+        if (mNfcAdapter != null) {
             mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, mNFCTechLists);
+        }
     }
 
+    /**
+     * onPause begins processing the disableForegroundDispatch in the background
+     *
+     * Written by Stephen Kuehl
+     */
     @Override
     public void onPause() {
         super.onPause();
 
+        // NFCadapter is active and awaiting scan
         if (mNfcAdapter != null)
             mNfcAdapter.disableForegroundDispatch(this);
     }
