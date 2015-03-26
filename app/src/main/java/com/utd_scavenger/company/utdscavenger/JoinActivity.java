@@ -8,11 +8,9 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
-
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
-import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +20,7 @@ import java.util.Arrays;
 /**
  * Handles the process of joining an existing game.
  *
- * Written by Jonathan Darling and Stephen Kuehl
+ * Written by Stephen Kuehl
  */
 public class JoinActivity extends Activity {
 
@@ -38,12 +36,11 @@ public class JoinActivity extends Activity {
      *
      * @param savedInstanceState If the activity is being re-initialized after
      *                           previously being shut down then this Bundle
-     *
      *                           contains the data it most recently supplied in
      *                           onSaveInstanceState(Bundle). Otherwise it is
      *                           null.
      *
-     * Written by Jonathan Darling
+     * Written by Stephen Kuehl
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +117,7 @@ public class JoinActivity extends Activity {
         }
 
         // Display a message to the user that the NFC tag has been accepted
-        Toast.makeText(getApplicationContext(), "Success! Loading Google Maps..",
+        Toast.makeText(getApplicationContext(), "Welcome!",
                 Toast.LENGTH_LONG).show();
 
         // Navigate to the Maps activity

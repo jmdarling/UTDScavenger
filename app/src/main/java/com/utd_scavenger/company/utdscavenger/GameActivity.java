@@ -41,8 +41,8 @@ public class GameActivity extends Activity implements OnMapReadyCallback{
     /**
      * Called when the map is ready to be used.
      *
-     * @param googleMap A non-null instance of a GoogleMap associated with the MapFragment or
-     *                  MapView that defines the callback.
+     * @param googleMap A non-null instance of a GoogleMap associated with the
+     *                  MapFragment or MapView that defines the callback.
      *
      *  Written by Jonathan Darling
      */
