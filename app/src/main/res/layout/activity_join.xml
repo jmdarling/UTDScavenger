@@ -26,8 +26,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Awaiting Contact.."
         android:id="@+id/tv"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp" />
 
 </LinearLayout>
