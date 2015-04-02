@@ -18,5 +18,7 @@
     <string name="title_activity_game">GameActivity</string>
     <string name="found_items">Found Items</string>
     <string name="items_to_find">Items to Find</string>
+    <string name="edit_existing_player">Add New Players</string>
+    <string name="add_edit_items">Add New Items</string>
 
 </resources>
