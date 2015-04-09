@@ -32,9 +32,9 @@
         android:layout_height="fill_parent"
         android:layout_below="@+id/editText">
     <Button
-        android:id="@+id/add_edit_items"
+        android:id="@+id/add_new_items"
         android:onClick="onClick"
-        android:text="@string/add_edit_items"
+        android:text="@string/add_new_items"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,9 +57,9 @@
         android:layout_weight="1"/>
 
     <Button
-        android:id="@+id/edit_players_button"
-        android:onClick="onClick"
-        android:text="@string/edit_existing_player"
+        android:id="@+id/add_new_players"
+        android:onClick="onClickPlayers"
+        android:text="@string/add_new_players"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
