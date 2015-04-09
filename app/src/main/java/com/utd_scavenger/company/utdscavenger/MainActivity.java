@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 /**
  * Intro activity for the application. This is where the user can decide to
@@ -78,4 +79,5 @@ public class MainActivity extends Activity {
                 break;
         }
     }
+
 }
