@@ -1,11 +1,13 @@
 package com.utd_scavenger.company.utdscavenger;
 
+import java.io.Serializable;
+
 /**
  * Class to represent a real life "item", specified by its name and location.
  *
  * Written by Jonathan Darling
  */
-public class Item {
+public class Item implements Serializable {
 
     private String name;
     private double latitude;
