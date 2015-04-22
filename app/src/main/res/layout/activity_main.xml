@@ -48,22 +48,5 @@
             android:layout_margin="5dp"
 
             style="@style/std_button" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </View>
-
-        <Button
-            android:id="@+id/edit_button"
-            android:onClick="onClick"
-            android:text="@string/edit_existing"
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-
-            style="@style/std_button" />
     </LinearLayout>
 </LinearLayout>

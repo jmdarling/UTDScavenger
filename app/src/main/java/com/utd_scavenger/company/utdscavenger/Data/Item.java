@@ -1,4 +1,4 @@
-package com.utd_scavenger.company.utdscavenger;
+package com.utd_scavenger.company.utdscavenger.Data;
 
 import java.io.Serializable;
 

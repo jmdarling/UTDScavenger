@@ -72,12 +72,6 @@ public class MainActivity extends Activity {
                 Intent createIntent = new Intent(this, CreateActivity.class);
                 startActivity(createIntent);
                 break;
-
-            case R.id.edit_button:
-                Intent editIntent = new Intent(this, EditActivity.class);
-                startActivity(editIntent);
-                break;
         }
     }
-
 }
