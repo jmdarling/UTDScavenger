@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 /**
  * Intro activity for the application. This is where the user can decide to
@@ -64,12 +63,12 @@ public class MainActivity extends Activity {
         // activity.
         switch (buttonClicked) {
             case R.id.join_button:
-                Intent joinIntent = new Intent(this, JoinActivity.class);
+                Intent joinIntent = new Intent(this, GameActivity.class);
                 startActivity(joinIntent);
                 break;
 
             case R.id.create_button:
-                Intent createIntent = new Intent(this, CreateActivity.class);
+                Intent createIntent = new Intent(this, CreateActivityStepOne.class);
                 startActivity(createIntent);
                 break;
         }

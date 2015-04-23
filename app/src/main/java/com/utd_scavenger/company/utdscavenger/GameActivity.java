@@ -224,17 +224,19 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
      */
     private void collectItem(String name) {
         // Find the item in the items list.
-        Item foundItem = null;
+        if (mItems != null) {
+            Item foundItem = null;
 
-        for (Item item : mItems) {
-            if (item.getName().equals(name)) {
-                foundItem = item;
+            for (Item item : mItems) {
+                if (item.getName().equals(name)) {
+                    foundItem = item;
+                }
             }
-        }
 
-        if (foundItem != null) {
-            mNotFoundItems.remove(foundItem);
-            mFoundItems.add(foundItem);
+            if (foundItem != null) {
+                mNotFoundItems.remove(foundItem);
+                mFoundItems.add(foundItem);
+            }
         }
 
         //TODO: update adapters for mNotFoundItems and mFoundItems
