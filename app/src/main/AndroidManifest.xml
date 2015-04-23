@@ -49,6 +49,11 @@
         <activity
             android:name=".GameActivity"
             android:label="@string/title_activity_game" >
+            <intent-filter>
+                action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/utdscavenger"/>
+            </intent-filter>
         </activity>
     </application>
 
