@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 
-public class CreateActivityStepTwo extends Activity{
+public class CreateStepTwoActivity extends Activity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
