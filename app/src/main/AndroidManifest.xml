@@ -43,7 +43,7 @@
             android:label="@string/title_activity_join" >
         </activity>
         <activity
-            android:name=".CreateActivityStepOne"
+            android:name=".CreateStepOneActivity"
             android:label="@string/title_activity_create" >
         </activity>
         <activity

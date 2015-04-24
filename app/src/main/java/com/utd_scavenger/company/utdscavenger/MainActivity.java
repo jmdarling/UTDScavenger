@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
                 break;
 
             case R.id.create_button:
-                Intent createIntent = new Intent(this, CreateActivityStepOne.class);
+                Intent createIntent = new Intent(this, CreateStepOneActivity.class);
                 startActivity(createIntent);
                 break;
         }
