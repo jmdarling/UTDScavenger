@@ -8,6 +8,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -32,6 +33,7 @@ public class CreateStepOneActivity extends Activity {
     // Bound UI elements.
     private EditText mItemName;
     private ListView mItemsListView;
+    private Button mSubmitButton;
 
     // Storage.
     private List<Item> mItems;
@@ -62,6 +64,8 @@ public class CreateStepOneActivity extends Activity {
 
         // Bind UI elements.
         mItemName = (EditText)findViewById(R.id.edit_name);
+        mItemsListView = (ListView)findViewById(R.id.items);
+        mSubmitButton = (Button)findViewById(R.id.submit);
     }
 
     /**
@@ -107,7 +111,7 @@ public class CreateStepOneActivity extends Activity {
                     mItemName.setText("");
 
                     // Create a new item to correspond to the tag.
-                    addItem(mItemName.getText().toString());
+                    new AddItemTask().execute(mItemName.getText().toString());
 
                 } catch (IOException | FormatException e) {
                     // This is expected to happen from time to time. The tag has
@@ -123,23 +127,12 @@ public class CreateStepOneActivity extends Activity {
         }
     }
 
-    /**
-     * Add a new Item to our list of items.
-     *
-     * @param name The name of the item to add.
-     */
-    private void addItem(String name) {
-        Toast.makeText(this, "Adding item...", Toast.LENGTH_LONG).show();
+    protected class AddItemTask extends AsyncTask<String, Void, Void> {
 
-        Item item = new Item(name, latitude, longitude);
-        System.out.println("Item created at latitude " + latitude + " and longitude " + longitude);
-    }
-
-    protected class AddItemTask extends AsyncTask<String, String, String> {
-
-        @Override
         protected void onPreExecute() {
-
+            // Disable the submit button, this task needs to finish before we
+            // go to the next step of the game creation process.
+            mSubmitButton.setEnabled(false);
         }
 
         /**
@@ -156,9 +149,13 @@ public class CreateStepOneActivity extends Activity {
          * @see #onPostExecute
          * @see #publishProgress
          */
-        @Override
-        protected String doInBackground(String... params) {
+        protected Void doInBackground(String... params) {
             return null;
+        }
+
+        protected void onPostExecute() {
+            // Re-enable the submit button.
+            mSubmitButton.setEnabled(true);
         }
     }
 }
