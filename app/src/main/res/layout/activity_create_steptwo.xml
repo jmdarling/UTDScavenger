@@ -46,7 +46,6 @@
             android:onClick="onClickDone"
             android:text="DONE"
 
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
