@@ -22,11 +22,11 @@ import java.util.ArrayList;
  * Written by Jonathan Darling and Stephen Kuehl
  */
 public class JoinActivity extends Activity {
-    // Helpers.
-    private NfcHelper mNfcHelper;
-
     // Bound UI elements.
     private ProgressBar mProgressBar;
+
+    // Helpers.
+    private NfcHelper mNfcHelper;
 
     /**
      * Called when the activity is starting.
