@@ -2,6 +2,7 @@ package com.utd_scavenger.company.utdscavenger;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
@@ -31,25 +32,22 @@ import java.util.Map;
  * Written by Jonathan Darling and Stephen Kuehl
  */
 public class GameActivity extends Activity implements OnMapReadyCallback {
-
-    // Storage.
-    private ArrayList<Item> mItems;
-    private ArrayList<Item> mNotFoundItems;
-    private ArrayList<String> mNotFoundItemsNames;
-    private ArrayList<Item> mFoundItems;
-    private ArrayList<String> mFoundItemsNames;
-
     // Adapters.
-    private ArrayAdapter<String> mNotFoundItemsNamesAdapter;
     private ArrayAdapter<String> mFoundItemsNamesAdapter;
+    private ArrayAdapter<String> mNotFoundItemsNamesAdapter;
+
+    // Bound UI elements.
+    private Map<String, Marker> mMapMarkers;
 
     // Helpers.
     private NfcHelper mNfcHelper;
 
-    // UI elements.
-    private AlertDialog mNotFoundItemsDialog;
-    private AlertDialog mFoundItemsDialog;
-    private Map<String, Marker> mMapMarkers;
+    // Storage.
+    private ArrayList<Item> mItems;
+    private ArrayList<Item> mFoundItems;
+    private ArrayList<String> mFoundItemsNames;
+    private ArrayList<Item> mNotFoundItems;
+    private ArrayList<String> mNotFoundItemsNames;
 
     /**
      * Called when the activity is starting. This is where most initialization
@@ -69,58 +67,41 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
         setContentView(R.layout.activity_game);
 
         // Initialization.
+        mFoundItems = new ArrayList<>();
+        mFoundItemsNames = new ArrayList<>();
+        mNotFoundItems = new ArrayList<>();
+        mNotFoundItemsNames = new ArrayList<>();
         mMapMarkers = new HashMap<>();
 
-        // Set up helpers.
+        // Set up NfcHelper.
         try {
             mNfcHelper = new NfcHelper(this, getClass());
         } catch (NfcNotAvailableException | NfcNotEnabledException e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
-        // Get the list of items from the intent.
-        Intent intent = getIntent();
-        mItems = (ArrayList) intent.getSerializableExtra("items");
+        // Set up adapters.
+        mFoundItemsNamesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mFoundItemsNames);
+        mNotFoundItemsNamesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mNotFoundItemsNames);
 
-        mNotFoundItems = new ArrayList<>();
-        mFoundItems = new ArrayList<>();
+        // Set up the map.
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        // Get the list of items from the intent.
+        mItems = (ArrayList) getIntent().getSerializableExtra("items");
 
         // The user hasn't found any items when they first start the game so
         // populate the notFoundItems list.
         if (mItems != null) {
             mNotFoundItems.addAll(mItems);
         }
-
-        //
-        mNotFoundItemsNames = new ArrayList<>();
-        mFoundItemsNames = new ArrayList<>();
-
-        // Set up the ListView adapters.
-        mNotFoundItemsNamesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mNotFoundItemsNames);
-        mFoundItemsNamesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mFoundItemsNames);
         updateItemsNamesListView();
-
-        // Set up the alert dialogs.
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setAdapter(mNotFoundItemsNamesAdapter, null)
-                .setTitle("Items to be found");
-
-        mNotFoundItemsDialog = builder.create();
-
-        builder = new AlertDialog.Builder(this);
-        builder.setAdapter(mFoundItemsNamesAdapter, null)
-                .setTitle("Items found");
-
-        mFoundItemsDialog = builder.create();
-
-        // Set up the map.
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
     }
 
     /**
-     * Called after onRestoreInstanceState, onRestart, or onPause, for your
-     * activity to start interacting with the user.
+     * Called after onRestoreInstanceState, onRestart, or onPause.
+     * Enables foreground dispatch.
      *
      * Written by Jonathan Darling and Stephen Kuehl
      */
@@ -137,6 +118,9 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
      * This is called for activities that set launchMode to "singleTop" in their
      * package, or if a client used the Intent.FLAG_ACTIVITY_SINGLE_TOP flag
      * when calling startActivity.
+     * Called when an NFC tag is read. This handles the high level tasks
+     * involved in reading an NFC tag. In our specific case, this should be
+     * called by scanning an NFC tag with an item name.
      *
      * @param intent The intent that was started.
      *
@@ -154,65 +138,6 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
                 collectItem(name);
             }
         }
-    }
-
-    /**
-     * Collect the item specified by the name. This will change the item's
-     * status from not being found to found as will be reflected in the found
-     * and not found lists.
-     *
-     * @param name The name of the item that was collected.
-     *
-     * Written by Jonathan Darling and Stephen Kuehl
-     */
-    private void collectItem(String name) {
-        // Find the item in the items list.
-        if (mItems != null) {
-            Item foundItem = null;
-
-            for (Item item : mItems) {
-                if (item.getName().equals(name)) {
-                    foundItem = item;
-                }
-            }
-
-            if (foundItem != null) {
-                mNotFoundItems.remove(foundItem);
-                mFoundItems.add(foundItem);
-
-                // Update the ListViews.
-                updateItemsNamesListView();
-
-                // TODO: remove markers.
-                Marker marker = mMapMarkers.get(name);
-                marker.remove();
-
-                Toast.makeText(this, "Collected item: " + name, Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void updateItemsNamesListView() {
-        mNotFoundItemsNames.clear();
-        mFoundItemsNames.clear();
-
-        for (Item item : mNotFoundItems) {
-            mNotFoundItemsNames.add(item.getName());
-        }
-        mNotFoundItemsNamesAdapter.notifyDataSetChanged();
-
-        for (Item item : mFoundItems) {
-            mFoundItemsNames.add(item.getName());
-        }
-        mFoundItemsNamesAdapter.notifyDataSetChanged();
-    }
-
-    public void foundItemsClick(View view) {
-        mFoundItemsDialog.show();
-    }
-
-    public void notFoundItemsClick(View view) {
-        mNotFoundItemsDialog.show();
     }
 
     /**
@@ -237,14 +162,201 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
         if (mItems != null) {
             Marker marker;
             for (Item item : mItems) {
-                 marker = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(item.getLatitude(), item.getLongitude()))
-                        .title(item.getName())
+                marker = map.addMarker(new MarkerOptions()
+                                .position(new LatLng(item.getLatitude(), item.getLongitude()))
+                                .title(item.getName())
                 );
 
                 // Save the markers to a Map so they may be deleted later.
                 mMapMarkers.put(item.getName(), marker);
             }
         }
+    }
+
+    /**
+     * Called when the activity has detected the user's press of the back key.
+     *
+     * Written by Jonathan Darling
+     */
+    @Override
+    public void onBackPressed() {
+
+        // Create a dialog that will let the user know that this will quit
+        // quit the game.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("This will quit your current game. Are you sure you want to quit?")
+                .setTitle("Quit game?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    /**
+                     * This method will be invoked when a button in the dialog
+                     * is clicked.
+                     *
+                     * @param dialog The dialog that received the click.
+                     * @param which The button that was clicked.
+                     */
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(GameActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                    /**
+                     * This method will be invoked when a button in the dialog
+                     * is clicked.
+                     *
+                     * @param dialog The dialog that received the click.
+                     * @param which The button that was clicked.
+                     */
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing.
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /**
+     * Collect the item specified by the name. This will change the item's
+     * status from not being found to found as will be reflected in the found
+     * and not found lists.
+     *
+     * @param name The name of the item that was collected.
+     *
+     * Written by Jonathan Darling and Stephen Kuehl
+     */
+    private void collectItem(String name) {
+        // Find the item in the items list.
+        if (mItems != null) {
+            Item foundItem = null;
+
+            for (Item item : mItems) {
+                if (item.getName().equals(name)) {
+                    foundItem = item;
+                    break;
+                }
+            }
+
+            if (foundItem != null) {
+                // Update the found items lists.
+                mNotFoundItems.remove(foundItem);
+                mFoundItems.add(foundItem);
+                updateItemsNamesListView();
+
+                // Remove the marker corresponding to this item.
+                Marker marker = mMapMarkers.get(name);
+                marker.remove();
+
+                Toast.makeText(this, "Collected item: " + name, Toast.LENGTH_SHORT).show();
+
+                // If the user has finished finding all of the items, let them
+                // know and allow them to leave the game.
+                if (mNotFoundItems.isEmpty()) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("You have found all of the items! Return to the game host.")
+                            .setTitle("Congratulations!")
+                            .setPositiveButton("Leave Game", new DialogInterface.OnClickListener() {
+
+                                /**
+                                 * This method will be invoked when a button in the dialog
+                                 * is clicked.
+                                 *
+                                 * @param dialog The dialog that received the click.
+                                 * @param which The button that was clicked.
+                                 */
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(GameActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                }
+                            });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the ListViews that display the found and not found items.
+     *
+     * Written by Jonathan Darling
+     */
+    private void updateItemsNamesListView() {
+        mNotFoundItemsNames.clear();
+        mFoundItemsNames.clear();
+
+        for (Item item : mNotFoundItems) {
+            mNotFoundItemsNames.add(item.getName());
+        }
+        mNotFoundItemsNamesAdapter.notifyDataSetChanged();
+
+        for (Item item : mFoundItems) {
+            mFoundItemsNames.add(item.getName());
+        }
+        mFoundItemsNamesAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Click listener that displays the found items dialog.
+     *
+     * @param view The view that was clicked.
+     *
+     * Written by Jonathan Darling
+     */
+    public void foundItemsClick(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setAdapter(mFoundItemsNamesAdapter, null)
+                .setTitle("Found items")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    /**
+                     * This method will be invoked when a button in the dialog
+                     * is clicked.
+                     *
+                     * @param dialog The dialog that received the click.
+                     * @param which The button that was clicked.
+                     *
+                     * Written by Jonathan Darling
+                     */
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing.
+                    }
+                });
+
+        builder.create().show();
+    }
+
+    /**
+     * Click listener that displays the not found items dialog.
+     *
+     * @param view The view that was clicked.
+     *
+     * Written by Jonathan Darling
+     */
+    public void notFoundItemsClick(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setAdapter(mNotFoundItemsNamesAdapter, null)
+                .setTitle("Not found items")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    /**
+                     * This method will be invoked when a button in the dialog
+                     * is clicked.
+                     *
+                     * @param dialog The dialog that received the click.
+                     * @param which The button that was clicked.
+                     */
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing.
+                    }
+                });
+
+        builder.create().show();
     }
 }
