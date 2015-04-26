@@ -8,6 +8,22 @@
     tools:context="com.utd_scavenger.company.utdscavenger.JoinActivity"
     android:orientation="vertical">
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="5dp" />
+
+    <TextView
+        android:text="@string/tap_phones_client_instructions"
+        android:textSize="22sp"
+        android:gravity="center"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <ImageView
         android:src="@drawable/tap_phones"
         android:contentDescription="@string/tap_phones_graphic"
@@ -16,20 +32,11 @@
         android:layout_height="wrap_content"/>
 
     <TextView
-        android:text="@string/tap_phones_client_instructions"
-        android:textSize="18sp"
+        android:text="@string/waiting_for_contact"
+        android:textSize="22sp"
         android:gravity="center"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Awaiting Contact.."
-        android:id="@+id/tv"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp" />
 
 </LinearLayout>

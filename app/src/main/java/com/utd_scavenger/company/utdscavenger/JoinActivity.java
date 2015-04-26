@@ -11,6 +11,8 @@ import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,16 +30,18 @@ import java.util.List;
 /**
  * Handles the process of joining an existing game.
  *
- * Written by Stephen Kuehl
+ * Written by Jonathan Darling and Stephen Kuehl
  */
 public class JoinActivity extends Activity {
-
+    // Helpers.
     private NfcHelper mNfcHelper;
 
+    // Bound UI elements.
+    private ProgressBar mProgressBar;
 
     /**
-     * Called when the activity is starting. This is where most initialization
-     * should go.
+     * Called when the activity is starting.
+     * Sets up an instance of NfcHelper.
      *
      * @param savedInstanceState If the activity is being re-initialized after
      *                           previously being shut down then this Bundle
@@ -45,24 +49,27 @@ public class JoinActivity extends Activity {
      *                           onSaveInstanceState(Bundle). Otherwise it is
      *                           null.
      *
-     * Written by Stephen Kuehl
+     * Written by Jonathan Darling and Stephen Kuehl
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
 
-        // Set up the NFC helper.
+        // Set up NfcHelper.
         try {
             mNfcHelper = new NfcHelper(this, getClass());
         } catch (NfcNotAvailableException | NfcNotEnabledException e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
+
+        // Bind UI elements.
+        mProgressBar = (ProgressBar)findViewById(R.id.progress_bar);
     }
 
     /**
-     * Called after onRestoreInstanceState, onRestart, or onPause, for your
-     * activity to start interacting with the user.
+     * Called after onRestoreInstanceState, onRestart, or onPause.
+     * Enables foreground dispatch.
      *
      * Written by Jonathan Darling and Stephen Kuehl
      */
@@ -71,7 +78,8 @@ public class JoinActivity extends Activity {
         super.onResume();
 
         // Enable foreground dispatch. This will ensure that when the NFC tag is
-        // read, it will immediately be processed by this activity.
+        // read, it will immediately be processed by this activity instead of
+        // allowing the user to choose where to route it.
         mNfcHelper.enableForegroundDispatch();
     }
 
@@ -79,6 +87,10 @@ public class JoinActivity extends Activity {
      * This is called for activities that set launchMode to "singleTop" in their
      * package, or if a client used the Intent.FLAG_ACTIVITY_SINGLE_TOP flag
      * when calling startActivity.
+     * Called when an NFC tag is read. This handles the high level tasks
+     * involved in reading an NFC tag. In our specific case, this should be
+     * called by an AndroidBeam message with game data.
+     *
      *
      * @param intent The intent that was started.
      *
@@ -88,14 +100,22 @@ public class JoinActivity extends Activity {
         // Check to see if the Activity was started by an NFC tag being read.
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
 
-            // Read the name of the item on the NFC tag.
-            String msg = mNfcHelper.getNfcMessage(intent);
-            ArrayList<Item> items = (ArrayList<Item>)ItemSerializer.deserializeItemList(msg);
+            // Get the items sent via AndroidBeam.
+            String message = mNfcHelper.getNfcMessage(intent);
+            if (!message.isEmpty()) {
+                ArrayList<Item> items = (ArrayList<Item>)ItemSerializer.deserializeItemList(message);
 
-            // Start the game with the items.
-            Intent gameIntent = new Intent(this, GameActivity.class);
-            gameIntent.putExtra("items", items);
-            startActivity(gameIntent);
+                // Show the progress bar as the game load can take a few
+                // seconds.
+                mProgressBar.setVisibility(View.VISIBLE);
+
+                // Start the game with the items.
+                Intent gameIntent = new Intent(this, GameActivity.class);
+                gameIntent.putExtra("items", items);
+                startActivity(gameIntent);
+            } else {
+                Toast.makeText(this, "Unfortunately, we were unable to join this game. Please try again.", Toast.LENGTH_LONG).show();
+            }
         }
     }
 }
