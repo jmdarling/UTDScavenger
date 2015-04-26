@@ -2,9 +2,6 @@ package com.utd_scavenger.company.utdscavenger;
 
 import android.app.Activity;
 import android.content.Intent;
-
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.location.Location;
 import android.nfc.FormatException;
 import android.nfc.NfcAdapter;
