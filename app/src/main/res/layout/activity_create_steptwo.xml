@@ -10,12 +10,42 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        >
+        android:layout_height="fill_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:text="Bump any players device that is in the 'Join' state."
+            android:gravity="center_horizontal"
+            android:id="@+id/textView"
+            android:paddingTop="20dp"
+            android:layout_gravity="center_horizontal" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:paddingTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/tap_phones" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:gravity="center_horizontal"
+            android:text="Keep adding players until your roster is complete."
+            android:id="@+id/textView2"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:layout_gravity="center_horizontal" />
+
         <Button
             android:id="@+id/add_new_players"
-            android:onClick="onClickPlayers"
-            android:text="@string/add_new_players"
+            android:onClick="onClickDone"
+            android:text="DONE"
+
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,15 +57,6 @@
             android:layout_below="@+id/editText"
             android:layout_centerHorizontal="true" />
 
-
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/listView_items"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/add_edit_items"
-            android:layout_weight="1"/>
 
     </LinearLayout>
 

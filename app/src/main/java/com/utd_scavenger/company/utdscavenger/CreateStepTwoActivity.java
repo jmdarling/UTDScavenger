@@ -1,6 +1,9 @@
 package com.utd_scavenger.company.utdscavenger;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
@@ -47,6 +50,27 @@ public class CreateStepTwoActivity extends Activity {
         // Create the NDEF message to send to recipients.
         NdefMessage ndefMessage = mNfcHelper.createNdefMessage(itemsSerialized);
         mNfcHelper.setNdefPushMessage(ndefMessage);
+    }
+
+    public void onClickDone (View view){
+        new AlertDialog.Builder(this)
+                .setTitle("Start Game")
+                .setMessage("Are you sure you have added all your players?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                        Intent myIntent = new Intent(getBaseContext(), MainActivity.class);
+                        startActivity(myIntent);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+
     }
 
     /**
