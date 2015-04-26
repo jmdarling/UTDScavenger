@@ -50,6 +50,12 @@ public class JoinActivity extends Activity {
             mNfcHelper = new NfcHelper(this, getClass());
         } catch (NfcNotAvailableException | NfcNotEnabledException e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+
+            // We cannot do anything without NFC, redirect back to the main
+            // activity.
+            finish();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         }
 
         // Bind UI elements.
