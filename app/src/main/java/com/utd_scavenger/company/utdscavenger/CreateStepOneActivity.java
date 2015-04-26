@@ -149,7 +149,7 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
 
             // Ensure that we have text in the text field. If not, we don't want
             // to write to the tag.
-            if (!itemName.isEmpty()) {
+            if (!itemName.isEmpty() && !mItemsNames.contains(itemName)) {
                 Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 try {
                     // Write to the tag.
@@ -168,6 +168,8 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
                     Toast.makeText(this, "Write failed, please try again.", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
+            } else if (mItemsNames.contains(itemName)) {
+                Toast.makeText(this, "You cannot have multiple items with the same name.", Toast.LENGTH_LONG).show();
             } else {
                 // There is no text in the text field, don't write.
                 Toast.makeText(this, "Please enter an item name before scanning.", Toast.LENGTH_LONG).show();
