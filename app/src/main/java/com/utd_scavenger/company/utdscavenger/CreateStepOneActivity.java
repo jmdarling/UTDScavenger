@@ -38,23 +38,21 @@ import java.util.List;
  * Written by Jonathan Darling and Stephen Kuehl
  */
 public class CreateStepOneActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener {
-    // Helpers.
-    private NfcHelper mNfcHelper;
+    // Adapters.
+    private ArrayAdapter<String> mItemsNamesAdapter;
 
     // Bound UI elements.
+    private Button mSubmitButton;
     private EditText mItemName;
     private ListView mItemsListView;
-    private Button mSubmitButton;
+
+    // Helpers.
+    private GoogleApiClient mGoogleApiClient;
+    private NfcHelper mNfcHelper;
 
     // Storage.
     private ArrayList<Item> mItems;
     private List<String> mItemsNames;
-
-    // Adapters.
-    private ArrayAdapter<String> mItemsNamesAdapter;
-
-    // Utility classes.
-    private GoogleApiClient mGoogleApiClient;
 
     /**
      * Called when the activity is starting. This is where most initialization
@@ -73,14 +71,18 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_stepone);
 
-        // Set up the Google API services.
+        // Initialization.
+        mItems = new ArrayList<>();
+        mItemsNames = new ArrayList<>();
+
+        // Set up GoogleApiClient.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
 
-        // Set up the NFC helper.
+        // Set up NfcHelper.
         try {
             mNfcHelper = new NfcHelper(this, getClass());
         } catch (NfcNotAvailableException | NfcNotEnabledException e) {
@@ -92,18 +94,21 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
         mItemsListView = (ListView)findViewById(R.id.items);
         mSubmitButton = (Button)findViewById(R.id.submit);
 
-        // Instantiate array lists.
-        mItems = new ArrayList<>();
-        mItemsNames = new ArrayList<>();
-
-        // Set up the array adapter and assign it to the list view.
+        // Set up adapters.
         mItemsNamesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mItemsNames);
         mItemsListView.setAdapter(mItemsNamesAdapter);
 
-        // Gray out the submit button
+        // Gray out the submit button to indicate that it is currently disabled.
         mSubmitButton.setAlpha(.5f);
     }
 
+    /**
+     * Called after onCreate — or after onRestart when the activity had been
+     * stopped, but is now again being displayed to the user. It will be
+     * followed by onResume.
+     *
+     * Written by Jonathan Darling
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -111,8 +116,8 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
     }
 
     /**
-     * Called after onRestoreInstanceState, onRestart, or onPause, for your
-     * activity to start interacting with the user.
+     * Called after onRestoreInstanceState, onRestart, or onPause.
+     * Enables foreground dispatch.
      *
      * Written by Jonathan Darling and Stephen Kuehl
      */
@@ -129,6 +134,9 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
      * This is called for activities that set launchMode to "singleTop" in their
      * package, or if a client used the Intent.FLAG_ACTIVITY_SINGLE_TOP flag
      * when calling startActivity.
+     * Called when an NFC tag is read. This handles the high level tasks
+     * involved in reading an NFC tag. In our specific case, this should be
+     * called by scanning an NFC tag.
      *
      * @param intent The intent that was started.
      *
@@ -139,12 +147,12 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
         // Note that we are using ACTION_TAG_DISCOVERED. This is generic so that
         // we can write to a fresh tag, not just one with NDEF data already on
         // it.
-        String action = intent.getAction();
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
             String itemName = mItemName.getText().toString();
+
             // Ensure that we have text in the text field. If not, we don't want
             // to write to the tag.
-            if (!itemName.equals("")) {
+            if (!itemName.isEmpty()) {
                 Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 try {
                     // Write to the tag.
@@ -160,7 +168,7 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
                     // This is expected to happen from time to time. The tag has
                     // to make contact for long enough to be successfully
                     // written to.
-                    Toast.makeText(this, "Write failed, please try again.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Write failed, please try again.", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             } else {
@@ -170,6 +178,11 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
         }
     }
 
+    /**
+     * Updates the ListView that displays the added items.
+     *
+     * Written by Jonathan Darling
+     */
     private void updateItemsNamesListView() {
         mItemsNames.clear();
         for (Item item : mItems) {
@@ -178,38 +191,75 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
         mItemsNamesAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Click listener for the continue button.
+     *
+     * @param view The view that was clicked.
+     *
+     * Written by Jonathan Darling
+     */
     public void onClickContinue(View view) {
         Intent intent = new Intent(this, CreateStepTwoActivity.class);
         intent.putExtra("items", mItems);
         startActivity(intent);
     }
 
+    /**
+     * Unused but required for interface.
+     *
+     * @param bundle
+     */
     @Override
     public void onConnected(Bundle bundle) {}
 
+    /**
+     * Unused but required for interface.
+     *
+     * @param i
+     */
     @Override
     public void onConnectionSuspended(int i) {}
 
+    /**
+     * Unused but required for interface.
+     *
+     * @param connectionResult
+     */
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {}
 
+    /**
+     * Adds an item to the list of items.
+     * This is done in an async task in case it takes time for the location to
+     * be found.
+     *
+     * Written by Jonathan Darling
+     */
     protected class AddItemTask extends AsyncTask<String, Void, Location> {
         private String mItemName;
 
+        /**
+         * Called before doInBackground.
+         * Disables the submit button.
+         *
+         * Written by Jonathan Darling
+         */
         protected void onPreExecute() {
             // Disable the submit button, this task needs to finish before we
             // go to the next step of the game creation process.
             mSubmitButton.setEnabled(false);
+            mSubmitButton.setAlpha(.5f);
         }
 
         /**
          * Perform a computation on a background thread.
          * Fetches the users current location.
          *
+         * @param params The item's name.
          *
-         * @param params The parameters of the task.
+         * @return The user's location.
          *
-         * @return A result, defined by the subclass of this task.
+         * Written by Jonathan Darling
          */
         protected Location doInBackground(String... params) {
             int attempts = 1;
@@ -242,6 +292,14 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
             return location;
         }
 
+        /**
+         * Called after doInBackground.
+         * Creates a new Item and re-enables the submit button.
+         *
+         * @param location The user's location.
+         *
+         * Written by Jonathan Darling
+         */
         protected void onPostExecute(Location location) {
             // Check if the user's location is available.
             if (location != null) {
@@ -257,8 +315,6 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
 
             // Re-enable the submit button.
             mSubmitButton.setEnabled(true);
-
-            // Return the submit button back to its normal state.
             mSubmitButton.setAlpha(1);
         }
     }
