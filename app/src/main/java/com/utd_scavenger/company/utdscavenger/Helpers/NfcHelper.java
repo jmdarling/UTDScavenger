@@ -154,6 +154,11 @@ public class NfcHelper {
         NdefRecord record = message.getRecords()[0];
 
         // Return the message stored in the first record.
-        return new String(record.getPayload());
+        String mime = new String(record.getType());
+        if (mime.equals("text/utdscavenger")) {
+            return new String(record.getPayload());
+        } else {
+            return "";
+        }
     }
 }

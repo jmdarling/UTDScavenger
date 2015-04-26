@@ -34,18 +34,12 @@
             <!-- Adding the Intent Filter tells the application to open on this activity first -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".JoinActivity"
             android:label="@string/title_activity_join" >
-            <intent-filter>
-                action android:name="android.nfc.action.NDEF_DISCOVERED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="text/utdscavenger"/>
-            </intent-filter>
         </activity>
         <activity
             android:name=".CreateStepOneActivity"
@@ -58,11 +52,6 @@
         <activity
             android:name=".GameActivity"
             android:label="@string/title_activity_game" >
-            <intent-filter>
-                action android:name="android.nfc.action.NDEF_DISCOVERED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="text/utdscavenger"/>
-            </intent-filter>
         </activity>
     </application>
 

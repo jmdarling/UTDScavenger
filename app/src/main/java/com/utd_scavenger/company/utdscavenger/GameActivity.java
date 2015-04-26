@@ -1,6 +1,7 @@
 package com.utd_scavenger.company.utdscavenger;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -10,6 +11,8 @@ import android.nfc.NfcAdapter;
 import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,11 +34,22 @@ import java.util.ArrayList;
  * Written by Jonathan Darling and Stephen Kuehl
  */
 public class GameActivity extends Activity implements OnMapReadyCallback {
+
+    // Storage.
     private ArrayList<Item> mItems;
     private ArrayList<Item> mNotFoundItems;
+    private ArrayList<String> mNotFoundItemsNames;
     private ArrayList<Item> mFoundItems;
+    private ArrayList<String> mFoundItemsNames;
+
+    // Adapters.
+    private ArrayAdapter<String> mNotFoundItemsNamesAdapter;
+    private ArrayAdapter<String> mFoundItemsNamesAdapter;
 
     private NfcHelper mNfcHelper;
+
+    private AlertDialog mNotFoundItemsDialog;
+    private AlertDialog mFoundItemsDialog;
 
     /**
      * Called when the activity is starting. This is where most initialization
@@ -74,6 +88,28 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
             mNotFoundItems.addAll(mItems);
         }
 
+        //
+        mNotFoundItemsNames = new ArrayList<>();
+        mFoundItemsNames = new ArrayList<>();
+
+        // Set up the ListView adapters.
+        mNotFoundItemsNamesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mNotFoundItemsNames);
+        mFoundItemsNamesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mFoundItemsNames);
+        updateItemsNamesListView();
+
+        // Set up the alert dialogs.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setAdapter(mNotFoundItemsNamesAdapter, null)
+                .setTitle("Items to be found");
+
+        mNotFoundItemsDialog = builder.create();
+
+        builder = new AlertDialog.Builder(this);
+        builder.setAdapter(mFoundItemsNamesAdapter, null)
+                .setTitle("Items found");
+
+        mFoundItemsDialog = builder.create();
+
         // Set up the map.
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -105,14 +141,15 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
      */
     protected void onNewIntent(Intent intent) {
         // Check to see if the Activity was started by an NFC tag being read.
-        String action = intent.getAction();
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
 
             // Read the name of the item on the NFC tag.
             String name = mNfcHelper.getNfcMessage(intent);
 
-            // "Collect" the item specified by the NFC tag.
-            collectItem(name);
+            if (!name.isEmpty()) {
+                // "Collect" the item specified by the NFC tag.
+                collectItem(name);
+            }
         }
     }
 
@@ -139,12 +176,40 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
             if (foundItem != null) {
                 mNotFoundItems.remove(foundItem);
                 mFoundItems.add(foundItem);
+
+                // Update the ListViews.
+                updateItemsNamesListView();
+
+                // TODO: remove markers.
             }
         }
 
         //TODO: update adapters for mNotFoundItems and mFoundItems
 
         Toast.makeText(this, "Collected item: " + name, Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateItemsNamesListView() {
+        mNotFoundItemsNames.clear();
+        mFoundItemsNames.clear();
+
+        for (Item item : mNotFoundItems) {
+            mNotFoundItemsNames.add(item.getName());
+        }
+        mNotFoundItemsNamesAdapter.notifyDataSetChanged();
+
+        for (Item item : mFoundItems) {
+            mFoundItemsNames.add(item.getName());
+        }
+        mFoundItemsNamesAdapter.notifyDataSetChanged();
+    }
+
+    public void foundItemsClick(View view) {
+        mFoundItemsDialog.show();
+    }
+
+    public void notFoundItemsClick(View view) {
+        mNotFoundItemsDialog.show();
     }
 
     /**
