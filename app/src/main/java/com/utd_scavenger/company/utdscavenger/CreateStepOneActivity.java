@@ -3,22 +3,31 @@ package com.utd_scavenger.company.utdscavenger;
 import android.app.Activity;
 import android.content.Intent;
 
+import android.location.Location;
 import android.nfc.FormatException;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationServices;
 import com.utd_scavenger.company.utdscavenger.Data.Item;
 import com.utd_scavenger.company.utdscavenger.Exceptions.NfcNotAvailableException;
 import com.utd_scavenger.company.utdscavenger.Exceptions.NfcNotEnabledException;
 import com.utd_scavenger.company.utdscavenger.Helpers.NfcHelper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +35,7 @@ import java.util.List;
  *
  * Written by Jonathan Darling and Stephen Kuehl
  */
-public class CreateStepOneActivity extends Activity {
+public class CreateStepOneActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener {
     // Helpers.
     private NfcHelper mNfcHelper;
 
@@ -36,7 +45,14 @@ public class CreateStepOneActivity extends Activity {
     private Button mSubmitButton;
 
     // Storage.
-    private List<Item> mItems;
+    private ArrayList<Item> mItems;
+    private List<String> mItemsNames;
+
+    // Adapters.
+    private ArrayAdapter<String> mItemsNamesAdapter;
+
+    // Utility classes.
+    private GoogleApiClient mGoogleApiClient;
 
     /**
      * Called when the activity is starting. This is where most initialization
@@ -55,6 +71,13 @@ public class CreateStepOneActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_stepone);
 
+        // Set up the Google API services.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
         // Set up the NFC helper.
         try {
             mNfcHelper = new NfcHelper(this, getClass());
@@ -66,6 +89,20 @@ public class CreateStepOneActivity extends Activity {
         mItemName = (EditText)findViewById(R.id.edit_name);
         mItemsListView = (ListView)findViewById(R.id.items);
         mSubmitButton = (Button)findViewById(R.id.submit);
+
+        // Instantiate array lists.
+        mItems = new ArrayList<>();
+        mItemsNames = new ArrayList<>();
+
+        // Set up the array adapter and assign it to the list view.
+        mItemsNamesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mItemsNames);
+        mItemsListView.setAdapter(mItemsNamesAdapter);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
     }
 
     /**
@@ -99,19 +136,20 @@ public class CreateStepOneActivity extends Activity {
         // it.
         String action = intent.getAction();
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
+            String itemName = mItemName.getText().toString();
             // Ensure that we have text in the text field. If not, we don't want
             // to write to the tag.
-            if (!mItemName.getText().toString().equals("")) {
+            if (!itemName.equals("")) {
                 Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 try {
                     // Write to the tag.
-                    mNfcHelper.write(mItemName.getText().toString(), tag);
+                    mNfcHelper.write(itemName, tag);
 
                     // Clear the text field.
                     mItemName.setText("");
 
                     // Create a new item to correspond to the tag.
-                    new AddItemTask().execute(mItemName.getText().toString());
+                    new AddItemTask().execute(itemName);
 
                 } catch (IOException | FormatException e) {
                     // This is expected to happen from time to time. The tag has
@@ -127,7 +165,31 @@ public class CreateStepOneActivity extends Activity {
         }
     }
 
-    protected class AddItemTask extends AsyncTask<String, Void, Void> {
+    private void updateItemsNamesListView() {
+        mItemsNames.clear();
+        for (Item item : mItems) {
+            mItemsNames.add(item.getName());
+        }
+        mItemsNamesAdapter.notifyDataSetChanged();
+    }
+
+    protected void onClickContinue(View view) {
+        Intent intent = new Intent(this, CreateStepTwoActivity.class);
+        intent.putExtra("items", mItems);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {}
+
+    @Override
+    public void onConnectionSuspended(int i) {}
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {}
+
+    protected class AddItemTask extends AsyncTask<String, Void, Location> {
+        private String mItemName;
 
         protected void onPreExecute() {
             // Disable the submit button, this task needs to finish before we
@@ -136,24 +198,58 @@ public class CreateStepOneActivity extends Activity {
         }
 
         /**
-         * Override this method to perform a computation on a background thread. The
-         * specified parameters are the parameters passed to {@link #execute}
-         * by the caller of this task.
-         * <p/>
-         * This method can call {@link #publishProgress} to publish updates
-         * on the UI thread.
+         * Perform a computation on a background thread.
+         * Fetches the users current location.
+         *
          *
          * @param params The parameters of the task.
+         *
          * @return A result, defined by the subclass of this task.
-         * @see #onPreExecute()
-         * @see #onPostExecute
-         * @see #publishProgress
          */
-        protected Void doInBackground(String... params) {
-            return null;
+        protected Location doInBackground(String... params) {
+            int attempts = 1;
+            int sleepTime = 1000; // 1000 ms = 1 second
+
+            // Save the item name to be added.
+            mItemName = params[0];
+
+            // Get the current location.
+            Location location;
+            location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+            // Ensure that the location was updated, if not, keep trying.
+            if (location == null) {
+                Toast.makeText(CreateStepOneActivity.this, "We're having a bit of trouble getting your location. Give us a few seconds.", Toast.LENGTH_LONG).show();
+
+                while (location == null && attempts <= 10) {
+                    // Sleep the thread for a second to allow the API services
+                    // to try and catch up.
+                    try {
+                        Thread.sleep(sleepTime, 0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                }
+            }
+
+            return location;
         }
 
-        protected void onPostExecute() {
+        protected void onPostExecute(Location location) {
+            // Check if the user's location is available.
+            if (location != null) {
+                // Create a new item and add it to the items list.
+                Item item = new Item(mItemName, location.getLatitude(), location.getLongitude());
+                mItems.add(item);
+
+                // Update the ListView
+                updateItemsNamesListView();
+            } else {
+                Toast.makeText(CreateStepOneActivity.this, "Unfortunately, we could not get your location at this time. Please try again later.", Toast.LENGTH_LONG).show();
+            }
+
             // Re-enable the submit button.
             mSubmitButton.setEnabled(true);
         }

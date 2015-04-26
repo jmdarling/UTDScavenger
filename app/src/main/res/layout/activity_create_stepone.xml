@@ -40,6 +40,7 @@
             android:id="@+id/submit"
             android:onClick="onClickContinue"
             android:text="Continue"
+            android:enabled="false"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
