@@ -1,8 +1,8 @@
 /**
- * This application is used to play a scavenger hunt game on the UTD campus. A host will create a
- * game and clients can join that game. The host will scan in nfc tagged items that the clients will
- * have to find. The game is over when all items have been found. The winner is the client with the
- * most items collected.
+ * This application is used to play a scavenger hunt game on the UTD campus.
+ * A host will create a game and clients can join that game. The host will scan
+ * in nfc tagged items that the clients will have to find. The game is over when
+ * all items have been found.
  *
  * Created by:
  *  Jonathan Darling - jxd128130
@@ -23,16 +23,15 @@ import android.os.Bundle;
 import android.view.View;
 
 /**
- * Intro activity for the application. This is where the user can decide to
- * join, create, or edit a game.
+ * Intro activity for the application.
+ * This is where the user can decide to join or create a game.
  *
  * Written by Jonathan Darling
  */
 public class MainActivity extends Activity {
 
     /**
-     * Called when the activity is starting. This is where most initialization
-     * should go.
+     * Called when the activity is starting.
      *
      * @param savedInstanceState If the activity is being re-initialized after
      *                           previously being shut down then this Bundle
@@ -49,8 +48,8 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Click listener for the join, create, and edit buttons. Clicking these
-     * buttons redirect to their respective activities.
+     * Click listener for the join and create buttons.
+     * Clicking these buttons will redirect to their respective activities.
      *
      * @param view The view that was clicked.
      *
