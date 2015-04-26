@@ -1,21 +1,12 @@
 package com.utd_scavenger.company.utdscavenger;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.utd_scavenger.company.utdscavenger.Data.Item;
 import com.utd_scavenger.company.utdscavenger.Exceptions.NfcNotAvailableException;
@@ -24,8 +15,6 @@ import com.utd_scavenger.company.utdscavenger.Helpers.ItemSerializer;
 import com.utd_scavenger.company.utdscavenger.Helpers.NfcHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Handles the process of joining an existing game.
