@@ -3,6 +3,8 @@ package com.utd_scavenger.company.utdscavenger;
 import android.app.Activity;
 import android.content.Intent;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.nfc.FormatException;
 import android.nfc.NfcAdapter;
@@ -97,6 +99,9 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
         // Set up the array adapter and assign it to the list view.
         mItemsNamesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mItemsNames);
         mItemsListView.setAdapter(mItemsNamesAdapter);
+
+        // Gray out the submit button
+        mSubmitButton.setAlpha(.5f);
     }
 
     @Override
@@ -252,6 +257,9 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
 
             // Re-enable the submit button.
             mSubmitButton.setEnabled(true);
+
+            // Return the submit button back to its normal state.
+            mSubmitButton.setAlpha(1);
         }
     }
 }
