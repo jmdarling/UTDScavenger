@@ -63,7 +63,7 @@ public class MainActivity extends Activity {
         // activity.
         switch (buttonClicked) {
             case R.id.join_button:
-                Intent joinIntent = new Intent(this, GameActivity.class);
+                Intent joinIntent = new Intent(this, JoinActivity.class);
                 startActivity(joinIntent);
                 break;
 

@@ -11,6 +11,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NfcF;
+import android.os.Parcelable;
 import android.widget.Toast;
 
 import com.utd_scavenger.company.utdscavenger.Exceptions.NfcNotAvailableException;
@@ -40,11 +41,18 @@ public class NfcHelper {
 
     /**
      * Enable foreground dispatch on the provided NfcAdapter.
-     *
-     * @param nfcAdapter The NfcAdapter to enable foreground dispatch on.
      */
     public void enableForegroundDispatch() {
         mNfcAdapter.enableForegroundDispatch(mActivity, createPendingIntent(), createIntentFilter(), createTechListArray());
+    }
+
+    /**
+     * Set the NDEF Push Message for the NFC adapter.
+     *
+     * @param ndefMessage The NDEF Push Message to set.
+     */
+    public void setNdefPushMessage(NdefMessage ndefMessage) {
+        mNfcAdapter.setNdefPushMessage(ndefMessage, mActivity);
     }
 
     /**
@@ -108,6 +116,11 @@ public class NfcHelper {
         ndef.close();
     }
 
+    public NdefMessage createNdefMessage(String text) {
+        NdefRecord[] records = { createRecord(text) };
+        return new NdefMessage(records);
+    }
+
     private NdefRecord createRecord(String text) {
         String mimeType = "text/utdscavenger";
 
@@ -116,5 +129,31 @@ public class NfcHelper {
 
         NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeTypeBytes, new byte[0], textBytes);
         return recordNFC;
+    }
+
+    /**
+     * Process any intent that is triggered by reading an NFC tag and return the
+     * tag's first message. This will work for our use case as we write the
+     * message ourselves.
+     *
+     * @param intent The NFC intent.
+     *
+     * @return The tag's first message.
+     *
+     * Written by Jonathan Darling and Stephen Kuehl
+     */
+    public String getNfcMessage(Intent intent) {
+
+        // Read any NDEF messages present on the tag.
+        Parcelable[] messages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+
+        // Get the first message.
+        NdefMessage message = (NdefMessage)messages[0];
+
+        // Get the first record.
+        NdefRecord record = message.getRecords()[0];
+
+        // Return the message stored in the first record.
+        return new String(record.getPayload());
     }
 }

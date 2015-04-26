@@ -173,7 +173,7 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
         mItemsNamesAdapter.notifyDataSetChanged();
     }
 
-    protected void onClickContinue(View view) {
+    public void onClickContinue(View view) {
         Intent intent = new Intent(this, CreateStepTwoActivity.class);
         intent.putExtra("items", mItems);
         startActivity(intent);
