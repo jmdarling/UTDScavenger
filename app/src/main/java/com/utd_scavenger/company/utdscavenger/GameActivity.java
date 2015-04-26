@@ -2,15 +2,9 @@ package com.utd_scavenger.company.utdscavenger;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.tech.NfcF;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -20,6 +14,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.utd_scavenger.company.utdscavenger.Data.Item;
 import com.utd_scavenger.company.utdscavenger.Exceptions.NfcNotAvailableException;
@@ -27,6 +22,8 @@ import com.utd_scavenger.company.utdscavenger.Exceptions.NfcNotEnabledException;
 import com.utd_scavenger.company.utdscavenger.Helpers.NfcHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Primary game screen.
@@ -46,10 +43,13 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
     private ArrayAdapter<String> mNotFoundItemsNamesAdapter;
     private ArrayAdapter<String> mFoundItemsNamesAdapter;
 
+    // Helpers.
     private NfcHelper mNfcHelper;
 
+    // UI elements.
     private AlertDialog mNotFoundItemsDialog;
     private AlertDialog mFoundItemsDialog;
+    private Map<String, Marker> mMapMarkers;
 
     /**
      * Called when the activity is starting. This is where most initialization
@@ -67,6 +67,9 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        // Initialization.
+        mMapMarkers = new HashMap<>();
 
         // Set up helpers.
         try {
@@ -181,12 +184,12 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
                 updateItemsNamesListView();
 
                 // TODO: remove markers.
+                Marker marker = mMapMarkers.get(name);
+                marker.remove();
+
+                Toast.makeText(this, "Collected item: " + name, Toast.LENGTH_SHORT).show();
             }
         }
-
-        //TODO: update adapters for mNotFoundItems and mFoundItems
-
-        Toast.makeText(this, "Collected item: " + name, Toast.LENGTH_SHORT).show();
     }
 
     private void updateItemsNamesListView() {
@@ -232,11 +235,15 @@ public class GameActivity extends Activity implements OnMapReadyCallback {
 
         // Add waypoints for items.
         if (mItems != null) {
+            Marker marker;
             for (Item item : mItems) {
-                map.addMarker(new MarkerOptions()
+                 marker = map.addMarker(new MarkerOptions()
                         .position(new LatLng(item.getLatitude(), item.getLongitude()))
                         .title(item.getName())
                 );
+
+                // Save the markers to a Map so they may be deleted later.
+                mMapMarkers.put(item.getName(), marker);
             }
         }
     }
