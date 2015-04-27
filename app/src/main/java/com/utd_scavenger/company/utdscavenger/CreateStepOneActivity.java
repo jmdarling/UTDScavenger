@@ -279,8 +279,6 @@ public class CreateStepOneActivity extends Activity implements ConnectionCallbac
 
             // Ensure that the location was updated, if not, keep trying.
             if (location == null) {
-                Toast.makeText(CreateStepOneActivity.this, "We're having a bit of trouble getting your location. Give us a few seconds.", Toast.LENGTH_LONG).show();
-
                 while (location == null && attempts <= 10) {
                     // Sleep the thread for a second to allow the API services
                     // to try and catch up.
