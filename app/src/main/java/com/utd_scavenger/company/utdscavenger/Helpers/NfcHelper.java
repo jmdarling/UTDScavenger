@@ -12,18 +12,33 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NfcF;
 import android.os.Parcelable;
-import android.widget.Toast;
 
 import com.utd_scavenger.company.utdscavenger.Exceptions.NfcNotAvailableException;
 import com.utd_scavenger.company.utdscavenger.Exceptions.NfcNotEnabledException;
 
 import java.io.IOException;
 
+/**
+ * Helper class to perform NFC Related tasks.
+ *
+ * Written by Jonathan Darling and Stephen Kuehl
+ */
 public class NfcHelper {
     private Activity mActivity;
     private Class mClass;
     private NfcAdapter mNfcAdapter;
 
+    /**
+     * Constructor.
+     *
+     * @param activity The activity the helper will be used in.
+     * @param parentClass The class the helper will be used in.
+     *
+     * @throws NfcNotAvailableException
+     * @throws NfcNotEnabledException
+     *
+     * Written by Jonathan Darling
+     */
     public NfcHelper(Activity activity, Class parentClass) throws NfcNotAvailableException, NfcNotEnabledException {
         this.mActivity = activity;
         this.mClass = parentClass;
@@ -31,25 +46,27 @@ public class NfcHelper {
 
         // Check to see if the device supports NFC.
         if (mNfcAdapter == null) {
-            Toast.makeText(activity, "NFC is not available on this device.", Toast.LENGTH_LONG).show();
             throw new NfcNotAvailableException();
         } else if (!mNfcAdapter.isEnabled()) {
-            Toast.makeText(activity, "NFC is not enabled on this device. Please enable NFC.", Toast.LENGTH_LONG).show();
             throw new NfcNotEnabledException();
         }
     }
 
     /**
-     * Enable foreground dispatch on the provided NfcAdapter.
+     * Enable foreground dispatch on the NfcAdapter.
+     *
+     * Written by Jonathan Darling
      */
     public void enableForegroundDispatch() {
         mNfcAdapter.enableForegroundDispatch(mActivity, createPendingIntent(), createIntentFilter(), createTechListArray());
     }
 
     /**
-     * Set the NDEF Push Message for the NFC adapter.
+     * Set the NDEF Push Message for the NfcAdapter.
      *
      * @param ndefMessage The NDEF Push Message to set.
+     *
+     * Written by Jonathan Darling
      */
     public void setNdefPushMessage(NdefMessage ndefMessage) {
         mNfcAdapter.setNdefPushMessage(ndefMessage, mActivity);
@@ -57,7 +74,9 @@ public class NfcHelper {
 
     /**
      * Create a PendingIntent for NFC tag reading. This intent will be ran when
-     * an NFC tag is scanned.
+     * a NFC tag is scanned.
+     *
+     * @return The pending intent that will be ran when a NFC tag is scanned.
      *
      * Written by Jonathan Darling and Stephen Kuehl
      */
@@ -84,6 +103,8 @@ public class NfcHelper {
      * Create an Intent Filter limited to the URI or MIME type to intercept TAG
      * scans from.
      *
+     * @return An array of intent filters.
+     *
      * Written by Jonathan Darling and Stephen Kuehl
      */
     private IntentFilter[] createIntentFilter() {
@@ -96,6 +117,8 @@ public class NfcHelper {
     /**
      * Create an array of technologies to handle.
      *
+     * @return An array of technologies to handle.
+     *
      * Written by Jonathan Darling and Stephen Kuehl
      */
     private String[][] createTechListArray() {
@@ -106,6 +129,17 @@ public class NfcHelper {
         };
     }
 
+    /**
+     * Write the provided text to the provided NFC tag.
+     *
+     * @param text The text to write to the tag.
+     * @param tag The tag to be written to.
+     *
+     * @throws IOException
+     * @throws FormatException
+     *
+     * Written by Jonathan Darling
+     */
     public void write(String text, Tag tag) throws IOException, FormatException {
 
         NdefRecord[] records = { createRecord(text) };
@@ -116,19 +150,36 @@ public class NfcHelper {
         ndef.close();
     }
 
+    /**
+     * Creates a NDEF message from the provided text.
+     *
+     * @param text The text to create the NDEF message from.
+     *
+     * @return The NDEF message created from the provided text.
+     *
+     * Written by Jonathan Darling
+     */
     public NdefMessage createNdefMessage(String text) {
         NdefRecord[] records = { createRecord(text) };
         return new NdefMessage(records);
     }
 
+    /**
+     * Creates a NDEF record from the provided text.
+     *
+     * @param text The text to create the NDEF record from.
+     *
+     * @return The NDEF record created from the provided text.
+     *
+     * Written by Jonathan Darling
+     */
     private NdefRecord createRecord(String text) {
         String mimeType = "text/utdscavenger";
 
         byte[] textBytes = text.getBytes();
         byte[] mimeTypeBytes = mimeType.getBytes();
 
-        NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeTypeBytes, new byte[0], textBytes);
-        return recordNFC;
+        return new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeTypeBytes, new byte[0], textBytes);
     }
 
     /**
