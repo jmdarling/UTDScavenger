@@ -17,7 +17,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher_utdscavenger"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <meta-data
@@ -29,7 +29,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main" >
+            android:label="UTD Scavenger" >
 
             <!-- Adding the Intent Filter tells the application to open on this activity first -->
             <intent-filter>
