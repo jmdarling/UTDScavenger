@@ -95,6 +95,8 @@ public class CreateStepTwoActivity extends Activity {
      * Written by Stephen Kuehl
      */
     public void onClickDone (View view){
+
+        // Create the Alert Dialog and set its properties.
         new AlertDialog.Builder(this)
                 .setTitle("Start Game")
                 .setMessage("Are you sure you have added all your players?")
@@ -110,6 +112,8 @@ public class CreateStepTwoActivity extends Activity {
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
+
+                // Show the dialog.
                 .show();
     }
 }
