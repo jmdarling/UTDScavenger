@@ -32,7 +32,7 @@ public class ItemSerializer {
     }
 
     /**
-     * Serialized a List of Items into a string
+     * Serializes a List of Items into a string
      *
      * @param items The List of Items to be serialized.
      *

@@ -86,7 +86,6 @@ public class JoinActivity extends Activity {
      * involved in reading an NFC tag. In our specific case, this should be
      * called by an AndroidBeam message with game data.
      *
-     *
      * @param intent The intent that was started.
      *
      * Written by Jonathan Darling and Stephen Kuehl

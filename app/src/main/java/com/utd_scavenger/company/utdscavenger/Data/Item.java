@@ -19,6 +19,8 @@ public class Item implements Serializable {
      * @param name The name of the item.
      * @param latitude The latitude of the item.
      * @param longitude The longitude of the item.
+     *
+     * Written by Jonathan Darling
      */
     public Item (String name, double latitude, double longitude) {
         this.name = name;
